@@ -5,12 +5,37 @@ import (
 	"net/http"
 )
 
-func handlerFunc(w http.ResponseWriter, r *http.Request){
-	fmt.Fprint(w, "<h1>Hello, World!</h1>")
+func homeHandlerFunc(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	fmt.Fprint(w, "<h1>Welcome to my awesome site!</h1>")
 }
 
-func main(){
-	http.HandleFunc("/", handlerFunc)
-	fmt.Println("Starting the server on PORT 3001...")
-	http.ListenAndServe(":3001", nil)
+func contactHandlerFunc(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	fmt.Fprint(w, "<h1>Contact Page</h1><p>To get in touch, email me at <a href=\"mailto:origho9@gmail.com\">origho9@gmail.com</a>.</p>")
+}
+
+func notFoundHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	w.WriteHeader(http.StatusNotFound)
+	fmt.Fprint(w, "<h1>Page not found</h1>")
+}
+
+func pathHandler(w http.ResponseWriter, r *http.Request) {
+	switch r.URL.Path {
+	case "/":
+		homeHandlerFunc(w, r)
+	case "/contact":
+		contactHandlerFunc(w, r)
+	default:
+		notFoundHandler(w, r)
+	}
+}
+
+func main() {
+	http.HandleFunc("/", pathHandler)
+	// http.HandleFunc("/contact", contactHandlerFunc)
+
+	fmt.Println("Starting the server on :5500...")
+	http.ListenAndServe(":5500", nil)
 }
