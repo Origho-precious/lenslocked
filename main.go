@@ -16,9 +16,14 @@ func contactHandlerFunc(w http.ResponseWriter, r *http.Request) {
 }
 
 func notFoundHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	w.WriteHeader(http.StatusNotFound)
-	fmt.Fprint(w, "<h1>Page not found</h1>")
+	// w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	// w.WriteHeader(http.StatusNotFound)
+	// fmt.Fprint(w, "<h1>Page not found</h1>")
+	// OR
+	// http.Error(w, "Page not found", http.StatusNotFound)
+	// OR
+	// http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+	http.Error(w, http.StatusText(404), http.StatusNotFound) // Not found
 }
 
 func pathHandler(w http.ResponseWriter, r *http.Request) {
