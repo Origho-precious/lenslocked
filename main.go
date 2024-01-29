@@ -26,7 +26,9 @@ func notFoundHandler(w http.ResponseWriter, r *http.Request) {
 	http.Error(w, http.StatusText(404), http.StatusNotFound) // Not found
 }
 
-func pathHandler(w http.ResponseWriter, r *http.Request) {
+type Router struct{}
+
+func (router Router) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	switch r.URL.Path {
 	case "/":
 		homeHandlerFunc(w, r)
@@ -38,9 +40,8 @@ func pathHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	http.HandleFunc("/", pathHandler)
-	// http.HandleFunc("/contact", contactHandlerFunc)
+	var router Router
 
 	fmt.Println("Starting the server on :5500...")
-	http.ListenAndServe(":5500", nil)
+	http.ListenAndServe(":5500", router)
 }
