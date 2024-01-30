@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
 )
 
 func homeHandler(w http.ResponseWriter, r *http.Request) {
@@ -85,12 +86,23 @@ func faqHandler(w http.ResponseWriter, r *http.Request) {
 	`)
 }
 
+func singleFaqHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+
+	faqID := chi.URLParam(r, "id")
+
+	fmt.Fprintf(w, "<p>The FAQ Id: %v</p>", faqID)
+}
+
 func main() {
 	r := chi.NewRouter()
+
+	r.Use(middleware.Logger)
 
 	r.Get("/", homeHandler)
 	r.Get("/contact", contactHandler)
 	r.Get("/faq", faqHandler)
+	r.Get("/faq/{id}", singleFaqHandler)
 	r.NotFound(notFoundHandler)
 
 	fmt.Println("Starting the server on :5500...")
