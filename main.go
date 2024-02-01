@@ -19,7 +19,9 @@ type PageData struct {
 func executeTemplate(w http.ResponseWriter, path string, data PageData) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 
-	tpl, err := template.ParseFiles(path)
+	footerPath := filepath.Join("templates", "footer.gohtml")
+
+	tpl, err := template.ParseFiles(path, footerPath)
 	if err != nil {
 		log.Printf("Error parsing template: %v", err)
 		http.Error(
