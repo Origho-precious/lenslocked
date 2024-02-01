@@ -11,7 +11,14 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 )
 
-func executeTemplate(w http.ResponseWriter, path string) {
+type PageData struct {
+	PageTitle string
+	Id        string
+}
+
+func executeTemplate(w http.ResponseWriter, path string, data interface{}) {
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+
 	tpl, err := template.ParseFiles(path)
 	if err != nil {
 		log.Printf("Error parsing template: %v", err)
@@ -24,7 +31,7 @@ func executeTemplate(w http.ResponseWriter, path string) {
 		return
 	}
 
-	err = tpl.Execute(w, nil)
+	err = tpl.Execute(w, data)
 	if err != nil {
 		log.Printf("Error executing template: %v", err)
 		http.Error(
@@ -36,19 +43,15 @@ func executeTemplate(w http.ResponseWriter, path string) {
 }
 
 func homeHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-
 	path := filepath.Join("templates", "home.gohtml")
 
-	executeTemplate(w, path)
+	executeTemplate(w, path, nil)
 }
 
 func contactHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-
 	path := filepath.Join("templates", "contact.gohtml")
 
-	executeTemplate(w, path)
+	executeTemplate(w, path, nil)
 }
 
 func notFoundHandler(w http.ResponseWriter, r *http.Request) {
@@ -63,68 +66,21 @@ func notFoundHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func faqHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	fmt.Fprint(w, `
-		<!DOCTYPE html>
-		<html lang="en">
-		<head>
-				<meta charset="UTF-8">
-				<meta name="viewport" content="width=device-width, initial-scale=1.0">
-				<title>FAQ</title>
-				<style>
-						body {
-								font-family: Arial, sans-serif;
-								margin: 20px;
-						}
+	path := filepath.Join("templates", "faqs.gohtml")
 
-						h1 {
-							font-size: 20px;
-						}
-
-						.faq-item {
-								margin-bottom: 20px;
-						}
-
-						.question {
-							font-size: 18px;
-								font-weight: bold;
-						}
-
-						.answer {
-							font-size: 16px;
-							margin-top: 5px;
-						}
-				</style>
-		</head>
-		<body>
-		<h1>FAQ Page</h1>
-
-		<div class="faq-item">
-				<p class="question">Is there a free version?</p>
-				<p class="answer">Yes! We offer a free trial for 30 days on any paid plan.</p>
-		</div>
-
-		<div class="faq-item">
-				<p class="question">What are your support hours?</p>
-				<p class="answer">We have a support staff answering 24/7, though response times may be a bit slower on weekends.</p>
-		</div>
-
-		<div class="faq-item">
-				<p class="question">How do I contact support?</p>
-				<p class="answer">Email us - <a href="mailto:support@lenslocked.com">support@lenslocked.com</a></p>
-		</div>
-
-		</body>
-		</html>
-	`)
+	executeTemplate(w, path, nil)
 }
 
 func singleFaqHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-
 	faqID := chi.URLParam(r, "id")
 
-	fmt.Fprintf(w, "<p>The FAQ Id: %v</p>", faqID)
+	path := filepath.Join("templates", "faq.gohtml")
+
+	executeTemplate(w, path, PageData{
+		PageTitle: "FAQ title",
+		Id:        faqID,
+	})
+
 }
 
 func main() {
@@ -134,8 +90,8 @@ func main() {
 
 	r.Get("/", homeHandler)
 	r.Get("/contact", contactHandler)
-	r.Get("/faq", faqHandler)
-	r.Get("/faq/{id}", singleFaqHandler)
+	r.Get("/faqs", faqHandler)
+	r.Get("/faqs/{id}", singleFaqHandler)
 	r.NotFound(notFoundHandler)
 
 	fmt.Println("Starting the server on :5500...")
