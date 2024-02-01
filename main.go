@@ -16,7 +16,7 @@ type PageData struct {
 	Id        string
 }
 
-func executeTemplate(w http.ResponseWriter, path string, data interface{}) {
+func executeTemplate(w http.ResponseWriter, path string, data PageData) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 
 	tpl, err := template.ParseFiles(path)
@@ -45,13 +45,13 @@ func executeTemplate(w http.ResponseWriter, path string, data interface{}) {
 func homeHandler(w http.ResponseWriter, r *http.Request) {
 	path := filepath.Join("templates", "home.gohtml")
 
-	executeTemplate(w, path, nil)
+	executeTemplate(w, path, PageData{})
 }
 
 func contactHandler(w http.ResponseWriter, r *http.Request) {
 	path := filepath.Join("templates", "contact.gohtml")
 
-	executeTemplate(w, path, nil)
+	executeTemplate(w, path, PageData{})
 }
 
 func notFoundHandler(w http.ResponseWriter, r *http.Request) {
@@ -68,7 +68,7 @@ func notFoundHandler(w http.ResponseWriter, r *http.Request) {
 func faqHandler(w http.ResponseWriter, r *http.Request) {
 	path := filepath.Join("templates", "faqs.gohtml")
 
-	executeTemplate(w, path, nil)
+	executeTemplate(w, path, PageData{})
 }
 
 func singleFaqHandler(w http.ResponseWriter, r *http.Request) {
