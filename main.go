@@ -21,7 +21,7 @@ func executeTemplate(w http.ResponseWriter, path string, data PageData) {
 
 	footerPath := filepath.Join("templates", "footer.gohtml")
 
-	tpl, err := template.ParseFiles(path, footerPath)
+	tpl, err := template.ParseFiles(path, footerPath )
 	if err != nil {
 		log.Printf("Error parsing template: %v", err)
 		http.Error(
