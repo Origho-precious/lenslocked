@@ -27,25 +27,28 @@ func main() {
 	r.Use(middleware.Logger)
 
 	// Home route
-	tpl, err := views.Parse(filepath.Join("templates", "home.gohtml"))
-	if err != nil {
-		panic(err)
-	}
-	r.Get("/", controllers.Statichandler(tpl, nil))
+	r.Get("/", controllers.Statichandler(
+		views.Must(
+			views.Parse(filepath.Join("templates", "home.gohtml")),
+		),
+		nil,
+	))
 
 	// Contact route
-	tpl, err = views.Parse(filepath.Join("templates", "contact.gohtml"))
-	if err != nil {
-		panic(err)
-	}
-	r.Get("/contact", controllers.Statichandler(tpl, nil))
+	r.Get("/contact", controllers.Statichandler(
+		views.Must(
+			views.Parse(filepath.Join("templates", "contact.gohtml")),
+		),
+		nil,
+	))
 
 	// FAQ route
-	tpl, err = views.Parse(filepath.Join("templates", "faqs.gohtml"))
-	if err != nil {
-		panic(err)
-	}
-	r.Get("/faqs", controllers.Statichandler(tpl, nil))
+	r.Get("/faqs", controllers.Statichandler(
+		views.Must(
+			views.Parse(filepath.Join("templates", "faqs.gohtml")),
+		),
+		nil,
+	))
 
 	r.NotFound(notFoundHandler)
 

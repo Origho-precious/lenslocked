@@ -12,6 +12,13 @@ type Template struct {
 	htmlTpl *template.Template
 }
 
+func Must(t Template, err error) Template {
+	if err != nil {
+		panic(err)
+	}
+	return t
+}
+
 func Parse(path string) (Template, error) {
 	footerPath := filepath.Join("templates", "footer.gohtml")
 
