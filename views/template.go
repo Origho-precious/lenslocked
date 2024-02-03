@@ -12,7 +12,7 @@ type Template struct {
 	htmlTpl *template.Template
 }
 
-func Parse(path string, data interface{}) (Template, error) {
+func Parse(path string) (Template, error) {
 	footerPath := filepath.Join("templates", "footer.gohtml")
 
 	tpl, err := template.ParseFiles(path, footerPath)
