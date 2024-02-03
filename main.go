@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"html/template"
+	"github/Origho-precious/lenslocked/views"
 	"log"
 	"net/http"
 	"path/filepath"
@@ -11,19 +11,12 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 )
 
-type PageData struct {
-	PageTitle string
-	Id        string
-}
-
-func executeTemplate(w http.ResponseWriter, path string, data PageData) {
+func executeTemplate(w http.ResponseWriter, path string, data interface{}) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 
-	footerPath := filepath.Join("templates", "footer.gohtml")
-
-	tpl, err := template.ParseFiles(path, footerPath )
+	tpl, err := views.Parse(path, data)
 	if err != nil {
-		log.Printf("Error parsing template: %v", err)
+		log.Printf("%v", err)
 		http.Error(
 			w,
 			"Something went wrong while parsing the template",
@@ -33,27 +26,19 @@ func executeTemplate(w http.ResponseWriter, path string, data PageData) {
 		return
 	}
 
-	err = tpl.Execute(w, data)
-	if err != nil {
-		log.Printf("Error executing template: %v", err)
-		http.Error(
-			w,
-			"Something went wrong while executing the template",
-			http.StatusInternalServerError,
-		)
-	}
+	tpl.Execute(w, data)
 }
 
 func homeHandler(w http.ResponseWriter, r *http.Request) {
 	path := filepath.Join("templates", "home.gohtml")
 
-	executeTemplate(w, path, PageData{})
+	executeTemplate(w, path, nil)
 }
 
 func contactHandler(w http.ResponseWriter, r *http.Request) {
 	path := filepath.Join("templates", "contact.gohtml")
 
-	executeTemplate(w, path, PageData{})
+	executeTemplate(w, path, nil)
 }
 
 func notFoundHandler(w http.ResponseWriter, r *http.Request) {
@@ -70,7 +55,7 @@ func notFoundHandler(w http.ResponseWriter, r *http.Request) {
 func faqHandler(w http.ResponseWriter, r *http.Request) {
 	path := filepath.Join("templates", "faqs.gohtml")
 
-	executeTemplate(w, path, PageData{})
+	executeTemplate(w, path, nil)
 }
 
 func singleFaqHandler(w http.ResponseWriter, r *http.Request) {
@@ -78,10 +63,15 @@ func singleFaqHandler(w http.ResponseWriter, r *http.Request) {
 
 	path := filepath.Join("templates", "faq.gohtml")
 
-	executeTemplate(w, path, PageData{
+	data := struct {
+		PageTitle string
+		Id        string
+	}{
 		PageTitle: "FAQ title",
 		Id:        faqID,
-	})
+	}
+
+	executeTemplate(w, path, data)
 
 }
 
