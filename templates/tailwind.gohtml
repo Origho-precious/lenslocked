@@ -9,10 +9,10 @@
 			rel="stylesheet"
 		/>
 	</head>
-	<body>
+	<body class="min-h-screen">
 		<header class="bg-gradient-to-r from-blue-800 to-indigo-800 text-white">
 			<nav class="px-8 py-6 flex items-center space-x-12">
-				<div class="text-4xl font-serif">Lenslocked</div>
+				<h3 class="text-4xl font-sans">Lenslocked</h3>
 				<div class="flex-grow">
 					<a class="text-lg font-semibold hover:text-blue-100 pr-8" href="/">
 						Home
@@ -40,6 +40,11 @@
 		<!-- Each page's content goes here. -->
 
 		{{define "footer"}}
+		<footer>
+			<div class="bg-gray-800 text-white py-12 text-center">
+				<p>Copyright &copy; 2024 Lenslocked</p>
+			</div>
+		</footer>
 	</body>
 </html>
 {{ end }}
