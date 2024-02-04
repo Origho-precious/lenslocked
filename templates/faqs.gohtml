@@ -1,6 +1,4 @@
-{{define "page"}}
-	<h1>FAQ Page</h1>
-	{{ range . }}
-		{{template "faq" .}}
-	{{ end }}
-{{end}}
+<h1>FAQ Page</h1>
+{{ range . }}
+{{template "faq" .}}
+{{ end }}
