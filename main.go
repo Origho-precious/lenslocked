@@ -39,12 +39,8 @@ func main() {
 	))
 
 	// FAQ route
-	r.Get("/faqs", controllers.FAQ(
-		views.Must(
-			views.ParseFS(
-				templates.FS, "faqs.gohtml", "faq.gohtml", "tailwind.gohtml",
-			),
-		),
+	r.Get("/faq", controllers.FAQ(
+		views.Must(views.ParseFS(templates.FS, "faq.gohtml", "tailwind.gohtml")),
 	))
 
 	r.NotFound(notFoundHandler)
