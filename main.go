@@ -27,27 +27,18 @@ func main() {
 	r.Use(middleware.Logger)
 
 	// Home route
-	r.Get("/", controllers.Statichandler(
-		views.Must(
-			views.ParseFS(templates.FS, "home.gohtml"),
-		),
-		nil,
+	r.Get("/", controllers.StaticHandler(
+		views.Must(views.ParseFS(templates.FS, "home.gohtml")),
 	))
 
 	// Contact route
-	r.Get("/contact", controllers.Statichandler(
-		views.Must(
-			views.ParseFS(templates.FS, "contact.gohtml"),
-		),
-		nil,
+	r.Get("/contact", controllers.StaticHandler(
+		views.Must(views.ParseFS(templates.FS, "contact.gohtml")),
 	))
 
 	// FAQ route
-	r.Get("/faqs", controllers.Statichandler(
-		views.Must(
-			views.ParseFS(templates.FS, "faqs.gohtml"),
-		),
-		nil,
+	r.Get("/faqs", controllers.FAQ(
+		views.Must(views.ParseFS(templates.FS, "faqs.gohtml", "faq.gohtml")),
 	))
 
 	r.NotFound(notFoundHandler)
