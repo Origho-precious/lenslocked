@@ -3,9 +3,9 @@ package views
 import (
 	"fmt"
 	"html/template"
+	"io/fs"
 	"log"
 	"net/http"
-	"path/filepath"
 )
 
 type Template struct {
@@ -19,10 +19,18 @@ func Must(t Template, err error) Template {
 	return t
 }
 
-func Parse(path string) (Template, error) {
-	footerPath := filepath.Join("templates", "footer.gohtml")
+func ParseFS(fs fs.FS, pattern string) (Template, error) {
+	tpl, err := template.ParseFS(fs, pattern)
 
-	tpl, err := template.ParseFiles(path, footerPath)
+	if err != nil {
+		return Template{}, fmt.Errorf("ParseFS:- parsing tempate: %w", err)
+	}
+
+	return Template{htmlTpl: tpl}, nil
+}
+
+func Parse(path string) (Template, error) {
+	tpl, err := template.ParseFiles(path)
 
 	if err != nil {
 		return Template{}, fmt.Errorf("parsing tempate: %w", err)

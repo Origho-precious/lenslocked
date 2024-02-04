@@ -3,9 +3,9 @@ package main
 import (
 	"fmt"
 	"github/Origho-precious/lenslocked/controllers"
+	"github/Origho-precious/lenslocked/templates"
 	"github/Origho-precious/lenslocked/views"
 	"net/http"
-	"path/filepath"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -29,7 +29,7 @@ func main() {
 	// Home route
 	r.Get("/", controllers.Statichandler(
 		views.Must(
-			views.Parse(filepath.Join("templates", "home.gohtml")),
+			views.ParseFS(templates.FS, "home.gohtml"),
 		),
 		nil,
 	))
@@ -37,7 +37,7 @@ func main() {
 	// Contact route
 	r.Get("/contact", controllers.Statichandler(
 		views.Must(
-			views.Parse(filepath.Join("templates", "contact.gohtml")),
+			views.ParseFS(templates.FS, "contact.gohtml"),
 		),
 		nil,
 	))
@@ -45,7 +45,7 @@ func main() {
 	// FAQ route
 	r.Get("/faqs", controllers.Statichandler(
 		views.Must(
-			views.Parse(filepath.Join("templates", "faqs.gohtml")),
+			views.ParseFS(templates.FS, "faqs.gohtml"),
 		),
 		nil,
 	))
