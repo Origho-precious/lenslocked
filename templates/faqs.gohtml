@@ -1,39 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>FAQ</title>
-		<style>
-			body {
-				font-family: Arial, sans-serif;
-				margin: 20px;
-			}
-
-			h1 {
-				font-size: 20px;
-			}
-
-			.faq-item {
-				margin-bottom: 20px;
-			}
-
-			.question {
-				font-size: 18px;
-				font-weight: bold;
-			}
-
-			.answer {
-				font-size: 16px;
-				margin-top: 5px;
-			}
-		</style>
-	</head>
-	<body>
-		<h1>FAQ Page</h1>
-
-		{{ range . }}
+{{define "page"}}
+	<h1>FAQ Page</h1>
+	{{ range . }}
 		{{template "faq" .}}
-		{{ end }}
-	</body>
-</html>
+	{{ end }}
+{{end}}

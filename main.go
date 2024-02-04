@@ -28,17 +28,19 @@ func main() {
 
 	// Home route
 	r.Get("/", controllers.StaticHandler(
-		views.Must(views.ParseFS(templates.FS, "home.gohtml")),
+		views.Must(views.ParseFS(templates.FS, "layout.gohtml", "home.gohtml")),
 	))
 
 	// Contact route
 	r.Get("/contact", controllers.StaticHandler(
-		views.Must(views.ParseFS(templates.FS, "contact.gohtml")),
+		views.Must(views.ParseFS(templates.FS, "layout.gohtml", "contact.gohtml")),
 	))
 
 	// FAQ route
 	r.Get("/faqs", controllers.FAQ(
-		views.Must(views.ParseFS(templates.FS, "faqs.gohtml", "faq.gohtml")),
+		views.Must(
+			views.ParseFS(templates.FS, "layout.gohtml", "faqs.gohtml", "faq.gohtml"),
+		),
 	))
 
 	r.NotFound(notFoundHandler)
