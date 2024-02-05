@@ -45,7 +45,7 @@ func main() {
 		views.ParseFS(templates.FS, "signup.gohtml", "tailwind.gohtml"),
 	)
 
-	r.Get("/signup", usersController.Create)
+	r.Get("/signup", usersController.New)
 
 	r.NotFound(notFoundHandler)
 

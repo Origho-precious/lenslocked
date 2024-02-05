@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"github/Origho-precious/lenslocked/views"
 	"html/template"
 	"net/http"
 )
@@ -11,13 +10,13 @@ type FaqStruct struct {
 	Answer   template.HTML
 }
 
-func StaticHandler(tpl views.Template) http.HandlerFunc {
+func StaticHandler(tpl Template) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		tpl.Execute(w, nil)
 	}
 }
 
-func FAQ(tpl views.Template) http.HandlerFunc {
+func FAQ(tpl Template) http.HandlerFunc {
 	questions := []FaqStruct{
 		{
 			Question: "Is there a free version?",

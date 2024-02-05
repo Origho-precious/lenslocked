@@ -1,16 +1,19 @@
 package controllers
 
-import (
-	"github/Origho-precious/lenslocked/views"
-	"net/http"
-)
+import "net/http"
 
-type User struct {
-	Template struct {
-		New views.Template
-	}
+type UserTemplate struct {
+	New Template
 }
 
-func (u User) Create(w http.ResponseWriter, r *http.Request) {
+type User struct {
+	Template UserTemplate
+}
+
+func (u User) New(w http.ResponseWriter, r *http.Request) {
+	u.Template.New.Execute(w, nil)
+}
+
+func (u User) ReturnJson(w http.ResponseWriter, r *http.Request) {
 	u.Template.New.Execute(w, nil)
 }
