@@ -26,27 +26,26 @@ func main() {
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
 
-	// Home route
 	r.Get("/", controllers.StaticHandler(
 		views.Must(views.ParseFS(templates.FS, "home.gohtml", "tailwind.gohtml")),
 	))
 
-	// Contact route
 	r.Get("/contact", controllers.StaticHandler(
 		views.Must(
 			views.ParseFS(templates.FS, "contact.gohtml", "tailwind.gohtml"),
 		),
 	))
 
-	// FAQ route
 	r.Get("/faq", controllers.FAQ(
 		views.Must(views.ParseFS(templates.FS, "faq.gohtml", "tailwind.gohtml")),
 	))
 
-	// FAQ route
-	r.Get("/signup", controllers.FAQ(
-		views.Must(views.ParseFS(templates.FS, "signup.gohtml", "tailwind.gohtml")),
-	))
+	usersController := controllers.User{}
+	usersController.Template.New = views.Must(
+		views.ParseFS(templates.FS, "signup.gohtml", "tailwind.gohtml"),
+	)
+
+	r.Get("/signup", usersController.Create)
 
 	r.NotFound(notFoundHandler)
 
