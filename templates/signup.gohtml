@@ -1,0 +1,28 @@
+{{template "header" .}}
+<form action="/signup" method="post">
+	<div>
+		<label for="email">Email Address</label>
+		<input
+			required
+			id="email"
+			name="email"
+			type="email"
+			autocomplete="email"
+			placeholder="Email address"
+		/>
+	</div>
+	<div>
+		<label for="password">Password</label>
+		<input
+			required
+			id="password"
+			name="password"
+			type="password"
+			placeholder="Password"
+		/>
+	</div>
+	<div>
+		<button type="submit">Sign up</button>
+	</div>
+</form>
+{{template "footer" .}}

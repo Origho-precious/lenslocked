@@ -43,6 +43,11 @@ func main() {
 		views.Must(views.ParseFS(templates.FS, "faq.gohtml", "tailwind.gohtml")),
 	))
 
+	// FAQ route
+	r.Get("/signup", controllers.FAQ(
+		views.Must(views.ParseFS(templates.FS, "signup.gohtml", "tailwind.gohtml")),
+	))
+
 	r.NotFound(notFoundHandler)
 
 	fmt.Println("Starting the server on :5500...")
