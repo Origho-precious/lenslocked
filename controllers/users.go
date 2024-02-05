@@ -20,8 +20,6 @@ func (u User) New(w http.ResponseWriter, r *http.Request) {
 
 	data.Email = r.FormValue("email")
 
-	fmt.Println(data)
-
 	u.Template.New.Execute(w, data)
 }
 
