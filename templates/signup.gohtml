@@ -10,12 +10,14 @@
 					Email Address
 				</label>
 				<input
-					name="email"
-					id="email"
-					type="email"
-					placeholder="Email address"
 					required
+					id="email"
+					name="email"
+					type="email"
+					value="{{.Email}}"
 					autocomplete="email"
+					placeholder="Email address"
+					{{if not .Email}}autofocus{{end}}
 					class="w-full px-3 py-2 border border-gray-300 placeholder-gray-400 text-gray-800 rounded"
 				/>
 			</div>
@@ -24,11 +26,12 @@
 					Password
 				</label>
 				<input
-					name="password"
+					required
 					id="password"
+					name="password"
 					type="password"
 					placeholder="Password"
-					required
+					{{if .Email}}autofocus{{end}}
 					class="w-full px-3 py-2 border border-gray-300 placeholder-gray-400 text-gray-800 rounded"
 				/>
 			</div>
