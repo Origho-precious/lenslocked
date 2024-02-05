@@ -46,6 +46,7 @@ func main() {
 	)
 
 	r.Get("/signup", usersController.New)
+	r.Post("/users", usersController.Create)
 
 	r.NotFound(notFoundHandler)
 
