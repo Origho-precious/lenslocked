@@ -93,25 +93,44 @@ func main() {
 	// fmt.Println("Records added!")
 
 	// Querying a record
-	id := 1
+	// id := 1
 
-	row := db.QueryRow(`
-		SELECT name, email
-		FROM users
-		WHERE id=$1;`, id,
-	)
+	// row := db.QueryRow(`
+	// 	SELECT name, email
+	// 	FROM users
+	// 	WHERE id=$1;`, id,
+	// )
 
-	var name, email string
+	// var name, email string
 
-	err = row.Scan(&name, &email)
+	// err = row.Scan(&name, &email)
 
-	if err == sql.ErrNoRows {
-		fmt.Println("Error, no rows!")
+	// if err == sql.ErrNoRows {
+	// 	fmt.Println("Error, no rows!")
+	// }
+
+	// if err != nil {
+	// 	panic(err)
+	// }
+
+	// fmt.Printf("User: name=%s, email=%s\n", name, email)
+
+	// Creating associated data
+
+	userId := 1
+
+	for i := 1; i <= 5; i++ {
+		amount := i * 100
+		desc := fmt.Sprintf("Fake order #%d", i)
+
+		_, err := db.Exec(`
+			INSERT INTO orders(user_id, amount, description)
+			VALUES ($1, $2, $3);`, userId, amount, desc)
+
+		if err != nil {
+			panic(err)
+		}
 	}
 
-	if err != nil {
-		panic(err)
-	}
-
-	fmt.Printf("User: name=%s, email=%s\n", name, email)
+	fmt.Println("Created fake orders!")
 }
