@@ -48,6 +48,7 @@ func main() {
 
 	fmt.Println("Database connection established!")
 
+	// Create tables
 	_, err = db.Exec(`
 		CREATE TABLE IF NOT EXISTS users (
 			id SERIAL PRIMARY KEY,
@@ -67,5 +68,19 @@ func main() {
 		panic(err)
 	}
 
-	fmt.Println("Tables created successfully!")
+	fmt.Println("Tables created!")
+
+	// Create records
+	name := "Bruce Wayne"
+	email := "bruce@wayne.com"
+
+	_, err = db.Exec(`INSERT INTO users (name, email)  VALUES ($1, $2);`,
+		name, email,
+	)
+
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println("Records added!")
 }
