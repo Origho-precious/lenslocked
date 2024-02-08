@@ -49,46 +49,69 @@ func main() {
 	fmt.Println("Database connection established!")
 
 	// Create tables
-	_, err = db.Exec(`
-		CREATE TABLE IF NOT EXISTS users (
-			id SERIAL PRIMARY KEY,
-			name TEXT,
-			email TEXT UNIQUE NOT NULL
-		);
+	// _, err = db.Exec(`
+	// 	CREATE TABLE IF NOT EXISTS users (
+	// 		id SERIAL PRIMARY KEY,
+	// 		name TEXT,
+	// 		email TEXT UNIQUE NOT NULL
+	// 	);
 
-		CREATE TABLE IF NOT EXISTS orders (
-			id SERIAL PRIMARY KEY,
-			user_id INT NOT NULL,
-			amount INT,
-			description TEXT
-		);
-	`)
+	// 	CREATE TABLE IF NOT EXISTS orders (
+	// 		id SERIAL PRIMARY KEY,
+	// 		user_id INT NOT NULL,
+	// 		amount INT,
+	// 		description TEXT
+	// 	);
+	// `)
 
-	if err != nil {
-		panic(err)
-	}
+	// if err != nil {
+	// 	panic(err)
+	// }
 
-	fmt.Println("Tables created!")
+	// fmt.Println("Tables created!")
 
 	// Create records
-	name := "Bruce Wayne"
-	email := "bruce@wayne.com"
+	// name := "Bruce Wayne"
+	// email := "bruce@wayne.com"
+
+	// row := db.QueryRow(`
+	// 	INSERT INTO users (name, email)
+	// 	VALUES ($1, $2) RETURNING id;`,
+	// 	name, email,
+	// )
+
+	// var id int
+
+	// err = row.Scan(&id)
+
+	// if err != nil {
+	// 	panic(err)
+	// }
+
+	// fmt.Println("id:", id)
+
+	// fmt.Println("Records added!")
+
+	// Querying a record
+	id := 1
 
 	row := db.QueryRow(`
-		INSERT INTO users (name, email)  
-		VALUES ($1, $2) RETURNING id;`,
-		name, email,
+		SELECT name, email
+		FROM users
+		WHERE id=$1;`, id,
 	)
 
-	var id int
+	var name, email string
 
-	err = row.Scan(&id)
+	err = row.Scan(&name, &email)
+
+	if err == sql.ErrNoRows {
+		fmt.Println("Error, no rows!")
+	}
 
 	if err != nil {
 		panic(err)
 	}
 
-	fmt.Println("id:", id)
-
-	fmt.Println("Records added!")
+	fmt.Printf("User: name=%s, email=%s\n", name, email)
 }
