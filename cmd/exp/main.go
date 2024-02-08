@@ -74,13 +74,21 @@ func main() {
 	name := "Bruce Wayne"
 	email := "bruce@wayne.com"
 
-	_, err = db.Exec(`INSERT INTO users (name, email)  VALUES ($1, $2);`,
+	row := db.QueryRow(`
+		INSERT INTO users (name, email)  
+		VALUES ($1, $2) RETURNING id;`,
 		name, email,
 	)
+
+	var id int
+
+	err = row.Scan(&id)
 
 	if err != nil {
 		panic(err)
 	}
+
+	fmt.Println("id:", id)
 
 	fmt.Println("Records added!")
 }
