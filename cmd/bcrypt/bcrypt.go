@@ -24,19 +24,27 @@ func hash(password string) {
 }
 
 func compare(password, hash string) {
+	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
 
+	if err != nil {
+		fmt.Printf("Incorrect password: %q\n", password)
+		return
+	}
+
+	fmt.Println("Password is correct!")
 }
 
 func main() {
-	fmt.Println(len(os.Args))
+	// fmt.Println(len(os.Args))
 	if len(os.Args) < 3 {
 		panic(`Need to specify a command e.g "hash" or "compare"`)
 	}
-
+	
 	var command, password, hashedPassword string
+	
 	command = os.Args[1]
 	password = os.Args[2]
-
+	
 	if len(os.Args) == 4 {
 		hashedPassword = os.Args[3]
 	}
