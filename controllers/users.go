@@ -6,12 +6,13 @@ import (
 	"net/http"
 )
 
-type UserTemplate struct {
-	New Template
+type UserTemplates struct {
+	New    Template
+	Signin Template
 }
 
 type Users struct {
-	Template    UserTemplate
+	Templates   UserTemplates
 	UserService *models.UserService
 }
 
@@ -22,7 +23,7 @@ func (u Users) New(w http.ResponseWriter, r *http.Request) {
 
 	data.Email = r.FormValue("email")
 
-	u.Template.New.Execute(w, data)
+	u.Templates.New.Execute(w, data)
 }
 
 func (u Users) Create(w http.ResponseWriter, r *http.Request) {
@@ -39,4 +40,14 @@ func (u Users) Create(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Println(email, password)
 	fmt.Fprintf(w, "User created: %+v", user)
+}
+
+func (u Users) Signin(w http.ResponseWriter, r *http.Request) {
+	var data struct {
+		Email string
+	}
+
+	data.Email = r.FormValue("email")
+
+	u.Templates.Signin.Execute(w, data)
 }

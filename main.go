@@ -57,12 +57,17 @@ func main() {
 		UserService: &userService,
 	}
 
-	usersController.Template.New = views.Must(
+	usersController.Templates.New = views.Must(
 		views.ParseFS(templates.FS, "signup.gohtml", "tailwind.gohtml"),
+	)
+
+	usersController.Templates.Signin = views.Must(
+		views.ParseFS(templates.FS, "signin.gohtml", "tailwind.gohtml"),
 	)
 
 	r.Get("/signup", usersController.New)
 	r.Post("/users", usersController.Create)
+	r.Get("/signin", usersController.Signin)
 
 	r.NotFound(notFoundHandler)
 
