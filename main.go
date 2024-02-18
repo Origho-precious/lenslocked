@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github/Origho-precious/lenslocked/controllers"
+	"github/Origho-precious/lenslocked/models"
 	"github/Origho-precious/lenslocked/templates"
 	"github/Origho-precious/lenslocked/views"
 	"net/http"
@@ -40,7 +41,22 @@ func main() {
 		views.Must(views.ParseFS(templates.FS, "faq.gohtml", "tailwind.gohtml")),
 	))
 
-	usersController := controllers.User{}
+	config := models.DefaultPostgresConfig()
+	db, err := models.Open(config)
+
+	if err != nil {
+		panic(err)
+	}
+	defer db.Close()
+
+	userService := models.UserService{
+		DB: db,
+	}
+
+	usersController := controllers.Users{
+		UserService: &userService,
+	}
+
 	usersController.Template.New = views.Must(
 		views.ParseFS(templates.FS, "signup.gohtml", "tailwind.gohtml"),
 	)
