@@ -10,6 +10,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/gorilla/csrf"
 )
 
 func notFoundHandler(w http.ResponseWriter, r *http.Request) {
@@ -73,6 +74,13 @@ func main() {
 
 	r.NotFound(notFoundHandler)
 
+	csrfAuthKey := "gFvi45R4fy5xNBlnEeZtQbfAVCYEIAUX"
+
+	csrfMiddleware := csrf.Protect(
+		[]byte(csrfAuthKey),
+		csrf.Secure(false), // TODO: update this before deploying
+	)
+
 	fmt.Println("Starting the server on :5500...")
-	http.ListenAndServe(":5500", r)
+	http.ListenAndServe(":5500", csrfMiddleware(r))
 }
