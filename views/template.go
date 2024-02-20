@@ -26,8 +26,8 @@ func ParseFS(fs fs.FS, patterns ...string) (Template, error) {
 
 	tpl = tpl.Funcs(
 		template.FuncMap{
-			"csrfField": func() template.HTML {
-				return `<!-- Implement the csrf field -->`
+			"csrfField": func() (template.HTML, error) {
+				return "", fmt.Errorf("csrfField not implemented")
 			},
 		},
 	)
