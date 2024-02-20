@@ -69,6 +69,7 @@ func main() {
 	r.Post("/users", usersController.Create)
 	r.Get("/signin", usersController.Signin)
 	r.Post("/signin", usersController.ProcessSignin)
+	r.Get("/users/me", usersController.CurrentUser)
 
 	r.NotFound(notFoundHandler)
 
