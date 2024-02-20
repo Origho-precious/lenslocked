@@ -3,7 +3,10 @@ package controllers
 import (
 	"fmt"
 	"github/Origho-precious/lenslocked/models"
+	"html/template"
 	"net/http"
+
+	"github.com/gorilla/csrf"
 )
 
 type UserTemplates struct {
@@ -18,10 +21,14 @@ type Users struct {
 
 func (u Users) New(w http.ResponseWriter, r *http.Request) {
 	var data struct {
-		Email string
+		Email     string
+		CSRFField template.HTML
 	}
 
 	data.Email = r.FormValue("email")
+	data.CSRFField = csrf.TemplateField(r)
+
+	fmt.Println(data.CSRFField)
 
 	u.Templates.New.Execute(w, data)
 }
@@ -65,9 +72,9 @@ func (u Users) ProcessSignin(w http.ResponseWriter, r *http.Request) {
 	}
 
 	cookie := http.Cookie{
-		Name:  "email",
-		Value: user.Email,
-		Path:  "/",
+		Name:     "email",
+		Value:    user.Email,
+		Path:     "/",
 		HttpOnly: true,
 	}
 
