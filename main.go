@@ -54,8 +54,13 @@ func main() {
 		DB: db,
 	}
 
+	sessionService := models.SessionService{
+		DB: db,
+	}
+
 	usersController := controllers.Users{
-		UserService: &userService,
+		UserService:    &userService,
+		SessionService: &sessionService,
 	}
 
 	usersController.Templates.New = views.Must(
