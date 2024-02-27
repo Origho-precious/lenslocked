@@ -76,6 +76,7 @@ func main() {
 	r.Get("/signin", usersController.Signin)
 	r.Post("/signin", usersController.ProcessSignin)
 	r.Get("/users/me", usersController.CurrentUser)
+	r.Post("/signout", usersController.ProcessSignOut)
 
 	r.NotFound(notFoundHandler)
 
