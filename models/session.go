@@ -1,7 +1,9 @@
 package models
 
 import (
+	"crypto/sha256"
 	"database/sql"
+	"encoding/base64"
 	"fmt"
 	"github/Origho-precious/lenslocked/rand"
 )
@@ -45,14 +47,71 @@ func (ss SessionService) Create(userId int) (*Session, error) {
 	session := Session{
 		UserId:    userId,
 		Token:     token,
-		TokenHash: "", // TODO: Set actual token hash
+		TokenHash: ss.hash(token),
 	}
 
-	// TODO: Store the session in our DB
+	row := ss.DB.QueryRow(`
+		UPDATE sessions
+		SET token_hash = $2
+		WHERE user_id = $1
+    RETURNING id;`, session.UserId, session.TokenHash,
+	)
+
+	err = row.Scan(&session.Id)
+	if err == sql.ErrNoRows {
+		// If no session exists, we will get ErrNoRows. That means we need to
+		// create a session object for that user.
+		row = ss.DB.QueryRow(`
+			INSERT INTO sessions (user_id, token_hash)
+			VALUES ($1, $2)
+			RETURNING id;`, session.UserId, session.TokenHash,
+		)
+		// The error will be overwritten with either a new error, or nil
+		err = row.Scan(&session.Id)
+	}
+	// If the err was not sql.ErrNoRows, we need to check to see if it was any
+	// other error. If it was sql.ErrNoRows it will be overwritten inside the if
+	// block, and we still need to check for any errors.
+	if err != nil {
+		return nil, fmt.Errorf("create: %w", err)
+	}
 
 	return &session, nil
 }
 
 func (ss *SessionService) User(token string) (*User, error) {
-	return nil, nil
+	tokenHash := ss.hash(token)
+
+	var user User
+
+	row := ss.DB.QueryRow(`
+		SELECT user_id
+		FROM sessions
+		WHERE token_hash = $1;`, tokenHash,
+	)
+
+	err := row.Scan(&user.Id)
+
+	if err != nil {
+		return nil, fmt.Errorf("user: %w", err)
+	}
+
+	row = ss.DB.QueryRow(`
+		SELECT email, password_hash 
+		FROM users
+		WHERE id = $1;`, user.Id,
+	)
+
+	err = row.Scan(&user.Email, &user.PasswordHash)
+	if err != nil {
+		return nil, fmt.Errorf("user: %w", err)
+	}
+
+	return &user, nil
+}
+
+func (ss *SessionService) hash(token string) string {
+	tokenHash := sha256.Sum256([]byte(token))
+	// base64 encode the data into a string
+	return base64.URLEncoding.EncodeToString(tokenHash[:])
 }
