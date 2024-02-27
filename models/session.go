@@ -115,3 +115,18 @@ func (ss *SessionService) hash(token string) string {
 	// base64 encode the data into a string
 	return base64.URLEncoding.EncodeToString(tokenHash[:])
 }
+
+func (ss *SessionService) Delete(token string) error {
+	tokenHash := ss.hash(token)
+
+	_, err := ss.DB.Exec(`
+		DELETE FROM sessions
+		WHERE token_hash = $1;`, tokenHash,
+	)
+
+	if err != nil {
+		return fmt.Errorf("delete: %w", err)
+	}
+
+	return nil
+}
