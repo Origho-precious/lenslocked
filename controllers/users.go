@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"fmt"
+	appcontext "github/Origho-precious/lenslocked/context"
 	"github/Origho-precious/lenslocked/models"
 	"net/http"
 )
@@ -14,6 +15,10 @@ type UserTemplates struct {
 type Users struct {
 	Templates      UserTemplates
 	UserService    *models.UserService
+	SessionService *models.SessionService
+}
+
+type UserMiddleware struct {
 	SessionService *models.SessionService
 }
 
@@ -86,22 +91,12 @@ func (u Users) ProcessSignin(w http.ResponseWriter, r *http.Request) {
 }
 
 func (u Users) CurrentUser(w http.ResponseWriter, r *http.Request) {
-	token, err := readCookie(r, CookieSession)
+	user := appcontext.User(r.Context())
 
-	if err != nil {
-		fmt.Println(err)
+	if user == nil {
 		http.Redirect(w, r, "/signin", http.StatusFound)
 		return
 	}
-
-	user, err := u.SessionService.User(token)
-
-	if err != nil {
-		fmt.Println(err)
-		http.Redirect(w, r, "/signin", http.StatusFound)
-		return
-	}
-
 	fmt.Fprintf(w, "Current user: %s\n", user.Email)
 }
 
@@ -123,4 +118,27 @@ func (u Users) ProcessSignOut(w http.ResponseWriter, r *http.Request) {
 	deleteCookie(w, CookieSession)
 
 	http.Redirect(w, r, "/signin", http.StatusFound)
+}
+
+func (umw UserMiddleware) SetUser(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		token, err := readCookie(r, CookieSession)
+		if err != nil {
+			next.ServeHTTP(w, r)
+			return
+		}
+
+		user, err := umw.SessionService.User(token)
+		if err != nil {
+			next.ServeHTTP(w, r)
+			return
+		}
+
+		ctx := r.Context()
+	
+		ctx = appcontext.WithUser(ctx, user)
+		
+		r = r.WithContext(ctx)
+		next.ServeHTTP(w, r)
+	})
 }

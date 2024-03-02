@@ -86,6 +86,10 @@ func main() {
 
 	r.NotFound(notFoundHandler)
 
+	userMiddleware := controllers.UserMiddleware{
+		SessionService: &sessionService,
+	}
+
 	csrfAuthKey := "gFvi45R4fy5xNBlnEeZtQbfAVCYEIAUX"
 
 	csrfMiddleware := csrf.Protect(
@@ -94,5 +98,5 @@ func main() {
 	)
 
 	fmt.Println("Starting the server on :5500...")
-	http.ListenAndServe(":5500", csrfMiddleware(r))
+	http.ListenAndServe(":5500", csrfMiddleware(userMiddleware.SetUser(r)))
 }
