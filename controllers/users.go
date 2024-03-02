@@ -128,6 +128,11 @@ func (umw UserMiddleware) SetUser(next http.Handler) http.Handler {
 			return
 		}
 
+		if token == "" {
+			http.Error(w, "Something went wrong.", http.StatusInternalServerError)
+			return
+		}
+
 		user, err := umw.SessionService.User(token)
 		if err != nil {
 			next.ServeHTTP(w, r)
