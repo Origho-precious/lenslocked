@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github/Origho-precious/lenslocked/controllers"
+	"github/Origho-precious/lenslocked/migrations"
 	"github/Origho-precious/lenslocked/models"
 	"github/Origho-precious/lenslocked/templates"
 	"github/Origho-precious/lenslocked/views"
@@ -49,6 +50,11 @@ func main() {
 		panic(err)
 	}
 	defer db.Close()
+
+	err = models.MigrateFS(db, migrations.FS, ".")
+	if err != nil {
+		panic(err)
+	}
 
 	userService := models.UserService{
 		DB: db,
