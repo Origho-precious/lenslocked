@@ -135,6 +135,10 @@ func main() {
 		views.ParseFS(templates.FS, "check-your-email.gohtml", "tailwind.gohtml"),
 	)
 
+	usersController.Templates.ResetPassword = views.Must(
+		views.ParseFS(templates.FS, "reset-pw.gohtml", "tailwind.gohtml"),
+	)
+
 	// Router and Routes
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
@@ -160,8 +164,6 @@ func main() {
 	r.Post("/users", usersController.Create)
 	r.Get("/signin", usersController.Signin)
 	r.Post("/signin", usersController.ProcessSignin)
-	r.Get("/forgot-pw", usersController.ForgotPassword)
-	r.Post("/forgot-pw", usersController.ProcessForgotPassword)
 
 	r.Route("/users/me", func(r chi.Router) {
 		r.Use(userMiddleware.RequireUser)
@@ -169,6 +171,11 @@ func main() {
 	})
 
 	r.Post("/signout", usersController.ProcessSignOut)
+
+	r.Get("/forgot-pw", usersController.ForgotPassword)
+	r.Post("/forgot-pw", usersController.ProcessForgotPassword)
+	r.Get("/reset-pw", usersController.ResetPassword)
+	r.Post("/reset-pw", usersController.ProcessResetPassword)
 
 	r.NotFound(notFoundHandler)
 

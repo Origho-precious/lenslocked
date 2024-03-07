@@ -11,15 +11,17 @@ import (
 type UserTemplates struct {
 	New            Template
 	Signin         Template
+	ResetPassword  Template
 	CheckYourEmail Template
 	ForgotPassword Template
 }
 
 type Users struct {
-	Templates            UserTemplates
-	UserService          *models.UserService
-	EmailService         *models.EmailService
-	SessionService       *models.SessionService
+	Templates      UserTemplates
+	UserService    *models.UserService
+	EmailService   *models.EmailService
+	SessionService *models.SessionService
+	// ResetTokenService    *models.ResetTokenService
 	PasswordResetService *models.PasswordResetService
 }
 
@@ -203,4 +205,52 @@ func (u Users) ProcessForgotPassword(w http.ResponseWriter, r *http.Request) {
 	}
 
 	u.Templates.CheckYourEmail.Execute(w, r, data)
+}
+
+func (u Users) ResetPassword(w http.ResponseWriter, r *http.Request) {
+	var data struct {
+		Token string
+	}
+
+	data.Token = r.FormValue("token")
+
+	u.Templates.ResetPassword.Execute(w, r, data)
+}
+
+func (u Users) ProcessResetPassword(w http.ResponseWriter, r *http.Request) {
+	var data struct {
+		Token    string
+		Password string
+	}
+
+	data.Token = r.FormValue("token")
+
+	data.Password = r.FormValue("password")
+
+	// Reset the password
+	user, err := u.PasswordResetService.Consume(data.Token)
+	if err != nil {
+		fmt.Println(err)
+		// TODO: Distinguish between server errors and invalid token errors.
+		http.Error(w, "Something went wrong.", http.StatusInternalServerError)
+		return
+	}
+
+	// Update the password
+	err = u.UserService.UpdatePassword(int(user.Id), data.Password)
+	if err != nil {
+		fmt.Println(err)
+		http.Error(w, "Something went wrong.", http.StatusInternalServerError)
+		return
+	}
+
+	// Signin the User
+	session, err := u.SessionService.Create(int(user.Id))
+	if err != nil {
+		fmt.Println(err)
+		http.Redirect(w, r, "/signin", http.StatusFound)
+		return
+	}
+	setCookie(w, CookieSession, session.Token)
+	http.Redirect(w, r, "/users/me", http.StatusFound)
 }
