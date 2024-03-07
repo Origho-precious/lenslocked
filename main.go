@@ -8,11 +8,53 @@ import (
 	"github/Origho-precious/lenslocked/templates"
 	"github/Origho-precious/lenslocked/views"
 	"net/http"
+	"os"
+	"strconv"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/gorilla/csrf"
+	"github.com/joho/godotenv"
 )
+
+type config struct {
+	PSQL models.PostgresConfig
+	SMTP models.SMTPConfig
+	CSRF struct {
+		Key    string
+		Secure bool
+	}
+	Server struct {
+		Address string
+	}
+}
+
+func loadEnvConfig() (config, error) {
+	var cfg config
+
+	err := godotenv.Load()
+	if err != nil {
+		return cfg, err
+	}
+
+	cfg.PSQL = models.DefaultPostgresConfig()
+
+	cfg.SMTP.Host = os.Getenv("SMTP_HOST")
+	portStr := os.Getenv("SMTP_PORT")
+
+	cfg.SMTP.Port, err = strconv.Atoi(portStr)
+	if err != nil {
+		return cfg, err
+	}
+	cfg.SMTP.Username = os.Getenv("SMTP_USERNAME")
+	cfg.SMTP.Password = os.Getenv("SMTP_PASSWORD")
+
+	cfg.CSRF.Key = "gFvi45R4fy5xNBlnEeZtQbfAVCYEIAUX"
+	cfg.CSRF.Secure = false
+
+	cfg.Server.Address = ":5500"
+	return cfg, nil
+}
 
 func notFoundHandler(w http.ResponseWriter, r *http.Request) {
 	// w.Header().Set("Content-Type", "text/html; charset=utf-8")
@@ -26,9 +68,13 @@ func notFoundHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	cfg, err := loadEnvConfig()
+	if err != nil {
+		panic(err)
+	}
+
 	// Database config
-	config := models.DefaultPostgresConfig()
-	db, err := models.Open(config)
+	db, err := models.Open(cfg.PSQL)
 
 	if err != nil {
 		panic(err)
@@ -41,30 +87,36 @@ func main() {
 	}
 
 	// Services
-	userService := models.UserService{
+	userService := &models.UserService{
 		DB: db,
 	}
 
-	sessionService := models.SessionService{
+	sessionService := &models.SessionService{
 		DB: db,
 	}
+
+	passwordResetService := &models.PasswordResetService{
+		DB: db,
+	}
+
+	emailService := models.NewEmailService(cfg.SMTP)
 
 	// Middlewares
 	userMiddleware := controllers.UserMiddleware{
-		SessionService: &sessionService,
+		SessionService: sessionService,
 	}
 
-	csrfAuthKey := "gFvi45R4fy5xNBlnEeZtQbfAVCYEIAUX"
-
 	csrfMiddleware := csrf.Protect(
-		[]byte(csrfAuthKey),
-		csrf.Secure(false), // TODO: update this before deploying
+		[]byte(cfg.CSRF.Key),
+		csrf.Secure(cfg.CSRF.Secure), // TODO: update this before deploying
 	)
 
 	// User controller
 	usersController := controllers.Users{
-		UserService:    &userService,
-		SessionService: &sessionService,
+		UserService:          userService,
+		EmailService:         emailService,
+		SessionService:       sessionService,
+		PasswordResetService: passwordResetService,
 	}
 
 	usersController.Templates.New = views.Must(
@@ -117,6 +169,10 @@ func main() {
 	r.NotFound(notFoundHandler)
 
 	// Start server
-	fmt.Println("Starting the server on :5500...")
-	http.ListenAndServe(":5500", r)
+	fmt.Printf("Starting the server on %s...", cfg.Server.Address)
+
+	err = http.ListenAndServe(cfg.Server.Address, r)
+	if err != nil {
+		panic(err)
+	}
 }
