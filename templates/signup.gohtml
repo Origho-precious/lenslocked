@@ -6,7 +6,7 @@
 		</h1>
 		<form action="/users" method="post">
 			<div class="hidden">
-				{{csrfField}}
+				{{ csrfField }}
 			</div>
 			<div class="my-2">
 				<label for="email" class="text-sm font-semibold text-gray-800">
@@ -20,7 +20,9 @@
 					value="{{.Email}}"
 					autocomplete="email"
 					placeholder="Email address"
-					{{if not .Email}}autofocus{{end}}
+					{{if
+					not
+					.Email}}autofocus{{end}}
 					class="w-full px-3 py-2 border border-gray-300 placeholder-gray-400 text-gray-800 rounded"
 				/>
 			</div>
@@ -34,7 +36,8 @@
 					name="password"
 					type="password"
 					placeholder="Password"
-					{{if .Email}}autofocus{{end}}
+					{{if
+					.Email}}autofocus{{end}}
 					class="w-full px-3 py-2 border border-gray-300 placeholder-gray-400 text-gray-800 rounded"
 				/>
 			</div>
@@ -51,7 +54,7 @@
 					<a href="/signin" class="underline">Sign in</a>
 				</p>
 				<p class="text-xs text-gray-500">
-					<a href="/reset-pw" class="underline">Forgot your password?</a>
+					<a href="/forgot-pw" class="underline">Forgot your password?</a>
 				</p>
 			</div>
 		</form>
