@@ -67,10 +67,6 @@ func (us *UserService) Create(email, password string) (*User, error) {
 		return nil, fmt.Errorf("create user: %w", err)
 	}
 
-	// if err != nil {
-	// 	return nil, fmt.Errorf("creating new user: %w", err)
-	// }
-
 	return &newUser, nil
 }
 

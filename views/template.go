@@ -37,11 +37,7 @@ func ParseFS(fs fs.FS, patterns ...string) (Template, error) {
 				return nil, fmt.Errorf("currentUser not implemented")
 			},
 			"errors": func() []string {
-				return []string{
-					"Don't do that!",
-					"The email address you provided is already associated with an account.",
-					"Something went wrong.",
-				}
+				return nil
 			},
 		},
 	)
@@ -65,7 +61,9 @@ func ParseFS(fs fs.FS, patterns ...string) (Template, error) {
 // 	return Template{htmlTpl: tpl}, nil
 // }
 
-func (t Template) Execute(w http.ResponseWriter, r *http.Request, data any) {
+func (t Template) Execute(
+	w http.ResponseWriter, r *http.Request, data any, errs ...error,
+) {
 	tpl, err := t.htmlTpl.Clone()
 
 	if err != nil {
@@ -85,6 +83,14 @@ func (t Template) Execute(w http.ResponseWriter, r *http.Request, data any) {
 			},
 			"currentUser": func() *models.User {
 				return appcontext.User(r.Context())
+			},
+			"errors": func() []string {
+				var errorMessages []string
+				for _, err := range errs {
+					// TODO: Don't keep this long term - we will see why in a later lesson
+					errorMessages = append(errorMessages, err.Error())
+				}
+				return errorMessages
 			},
 		},
 	)
