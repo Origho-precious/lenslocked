@@ -36,6 +36,13 @@ func ParseFS(fs fs.FS, patterns ...string) (Template, error) {
 			"currentUser": func() (*models.User, error) {
 				return nil, fmt.Errorf("currentUser not implemented")
 			},
+			"errors": func() []string {
+				return []string{
+					"Don't do that!",
+					"The email address you provided is already associated with an account.",
+					"Something went wrong.",
+				}
+			},
 		},
 	)
 
