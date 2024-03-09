@@ -2,6 +2,7 @@ package views
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	appcontext "github/Origho-precious/lenslocked/context"
 	"github/Origho-precious/lenslocked/models"
@@ -13,6 +14,10 @@ import (
 
 	"github.com/gorilla/csrf"
 )
+
+type public interface {
+	Public() string
+}
 
 type Template struct {
 	htmlTpl *template.Template
@@ -76,6 +81,9 @@ func (t Template) Execute(
 		return
 	}
 
+	// Call the errMessages func before the closures.
+	errMsgs := errMessages(errs...)
+
 	tpl = tpl.Funcs(
 		template.FuncMap{
 			"csrfField": func() template.HTML {
@@ -85,12 +93,7 @@ func (t Template) Execute(
 				return appcontext.User(r.Context())
 			},
 			"errors": func() []string {
-				var errorMessages []string
-				for _, err := range errs {
-					// TODO: Don't keep this long term - we will see why in a later lesson
-					errorMessages = append(errorMessages, err.Error())
-				}
-				return errorMessages
+				return errMsgs
 			},
 		},
 	)
@@ -110,4 +113,18 @@ func (t Template) Execute(
 	}
 
 	io.Copy(w, &buf)
+}
+
+func errMessages(errs ...error) []string {
+	var msgs []string
+	for _, err := range errs {
+		var pubErr public
+		if errors.As(err, &pubErr) {
+			msgs = append(msgs, pubErr.Public())
+		} else {
+			fmt.Println(err)
+			msgs = append(msgs, "Something went wrong.")
+		}
+	}
+	return msgs
 }
