@@ -3,6 +3,7 @@ package controllers
 import (
 	"fmt"
 	appcontext "github/Origho-precious/lenslocked/context"
+	apperrors "github/Origho-precious/lenslocked/errors"
 	"github/Origho-precious/lenslocked/models"
 	"net/http"
 	"net/url"
@@ -40,18 +41,20 @@ func (u Users) New(w http.ResponseWriter, r *http.Request) {
 }
 
 func (u Users) Create(w http.ResponseWriter, r *http.Request) {
-		var data struct {
+	var data struct {
 		Email    string
 		Password string
 	}
 	data.Email = r.FormValue("email")
 	data.Password = r.FormValue("password")
-
 	user, err := u.UserService.Create(data.Email, data.Password)
-
 	if err != nil {
-		u.Templates.New.Execute(w, r, nil, err)
-		return
+		if apperrors.Is(err, models.ErrEmailTaken) {
+			err = apperrors.Public(
+				err, "That email address is already associated with an account.",
+			)
+		}
+		u.Templates.New.Execute(w, r, data, err)
 	}
 
 	session, err := u.SessionService.Create(int(user.Id))
