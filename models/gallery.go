@@ -115,3 +115,4 @@ func (service *GalleryService) Delete(id int) error {
 
 	return nil
 }
+

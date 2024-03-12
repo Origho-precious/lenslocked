@@ -195,6 +195,7 @@ func main() {
 		r.Group(func(r chi.Router) {
 			r.Use(userMiddleware.RequireUser)
 			r.Get("/new", galleryController.New)
+			r.Post("/", galleryController.Create)
 		})
 	})
 
