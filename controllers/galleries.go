@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	appcontext "github/Origho-precious/lenslocked/context"
-	apperrors "github/Origho-precious/lenslocked/errors"
 	"github/Origho-precious/lenslocked/models"
 	"net/http"
 	"strconv"
@@ -77,21 +76,31 @@ func (g Galleries) Create(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, editPath, http.StatusFound)
 }
 
-func (g Galleries) Edit(w http.ResponseWriter, r *http.Request) {
+func (g Galleries) galleryByID(
+	w http.ResponseWriter, r *http.Request,
+) (*models.Gallery, error) {
 	id, err := strconv.Atoi(chi.URLParam(r, "id"))
 	if err != nil {
-		// 404 error - page isn't found.
 		http.Error(w, "Invalid ID", http.StatusNotFound)
-		return
+		return nil, err
 	}
 
 	gallery, err := g.GalleryService.ByID(id)
 	if err != nil {
-		if err == models.ErrNotFound {
+		if errors.Is(err, models.ErrNotFound) {
 			http.Error(w, "Gallery not found", http.StatusNotFound)
-			return
+			return nil, err
 		}
 		http.Error(w, "Something went wrong", http.StatusInternalServerError)
+		return nil, err
+	}
+
+	return gallery, nil
+}
+
+func (g Galleries) Edit(w http.ResponseWriter, r *http.Request) {
+	gallery, err := g.galleryByID(w, r)
+	if err != nil {
 		return
 	}
 
@@ -113,19 +122,8 @@ func (g Galleries) Edit(w http.ResponseWriter, r *http.Request) {
 }
 
 func (g Galleries) Update(w http.ResponseWriter, r *http.Request) {
-	id, err := strconv.Atoi(chi.URLParam(r, "id"))
+	gallery, err := g.galleryByID(w, r)
 	if err != nil {
-		http.Error(w, "Invalid ID", http.StatusNotFound)
-		return
-	}
-
-	gallery, err := g.GalleryService.ByID(id)
-	if err != nil {
-		if apperrors.Is(err, models.ErrNotFound) {
-			http.Error(w, "Gallery not found", http.StatusNotFound)
-			return
-		}
-		http.Error(w, "Something went wrong", http.StatusInternalServerError)
 		return
 	}
 
@@ -177,19 +175,8 @@ func (g Galleries) Index(w http.ResponseWriter, r *http.Request) {
 }
 
 func (g Galleries) Show(w http.ResponseWriter, r *http.Request) {
-	id, err := strconv.Atoi(chi.URLParam(r, "id"))
+	gallery, err := g.galleryByID(w, r)
 	if err != nil {
-		http.Error(w, "Invalid ID", http.StatusNotFound)
-		return
-	}
-
-	gallery, err := g.GalleryService.ByID(id)
-	if err != nil {
-		if errors.Is(err, models.ErrNotFound) {
-			http.Error(w, "Gallery not found", http.StatusNotFound)
-			return
-		}
-		http.Error(w, "Something went wrong", http.StatusInternalServerError)
 		return
 	}
 

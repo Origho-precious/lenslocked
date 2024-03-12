@@ -1,2 +1,4 @@
 lenslocked
 .env
+
+cmd/random_images.go
