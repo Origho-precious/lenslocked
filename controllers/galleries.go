@@ -23,6 +23,8 @@ type Galleries struct {
 	GalleryService *models.GalleryService
 }
 
+type galleryOpt func(http.ResponseWriter, *http.Request, *models.Gallery) error
+
 var dogImages = []string{
 	"https://images.unsplash.com/photo-1591160690555-5debfba289f0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxNDA1Mzh8MHwxfHJhbmRvbXx8fHx8fHx8fDE3MTAyNTMyMjB8&ixlib=rb-4.0.3&q=80&w=1080",
 	"https://images.unsplash.com/photo-1589941013453-ec89f33b5e95?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxNDA1Mzh8MHwxfHJhbmRvbXx8fHx8fHx8fDE3MTAyNTMyMjB8&ixlib=rb-4.0.3&q=80&w=1080",
@@ -44,6 +46,18 @@ var dogImages = []string{
 	"https://images.unsplash.com/photo-1520580413066-ac45756bdc71?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxNDA1Mzh8MHwxfHJhbmRvbXx8fHx8fHx8fDE3MTAyNTMyMjB8&ixlib=rb-4.0.3&q=80&w=1080",
 	"https://images.unsplash.com/photo-1502673530728-f79b4cab31b1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxNDA1Mzh8MHwxfHJhbmRvbXx8fHx8fHx8fDE3MTAyNTMyMjB8&ixlib=rb-4.0.3&q=80&w=1080",
 	"https://images.unsplash.com/photo-1514984879728-be0aff75a6e8?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxNDA1Mzh8MHwxfHJhbmRvbXx8fHx8fHx8fDE3MTAyNTMyMjB8&ixlib=rb-4.0.3&q=80&w=1080",
+}
+
+func userMustOwnGallery(
+	w http.ResponseWriter, r *http.Request, gallery *models.Gallery,
+) error {
+	user := appcontext.User(r.Context())
+	if user.ID != gallery.UserID {
+		http.Error(w, "You are not authorized to edit this gallery", http.StatusForbidden)
+		return fmt.Errorf("user does not have access to this gallery")
+	}
+
+	return nil
 }
 
 func (g Galleries) New(w http.ResponseWriter, r *http.Request) {
@@ -77,7 +91,7 @@ func (g Galleries) Create(w http.ResponseWriter, r *http.Request) {
 }
 
 func (g Galleries) galleryByID(
-	w http.ResponseWriter, r *http.Request,
+	w http.ResponseWriter, r *http.Request, opts ...galleryOpt,
 ) (*models.Gallery, error) {
 	id, err := strconv.Atoi(chi.URLParam(r, "id"))
 	if err != nil {
@@ -95,18 +109,19 @@ func (g Galleries) galleryByID(
 		return nil, err
 	}
 
+	for _, opt := range opts {
+		err = opt(w, r, gallery)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	return gallery, nil
 }
 
 func (g Galleries) Edit(w http.ResponseWriter, r *http.Request) {
-	gallery, err := g.galleryByID(w, r)
+	gallery, err := g.galleryByID(w, r, userMustOwnGallery)
 	if err != nil {
-		return
-	}
-
-	user := appcontext.User(r.Context())
-	if gallery.UserID != user.ID {
-		http.Error(w, "You are not authorized to edit this gallery", http.StatusForbidden)
 		return
 	}
 
@@ -122,14 +137,8 @@ func (g Galleries) Edit(w http.ResponseWriter, r *http.Request) {
 }
 
 func (g Galleries) Update(w http.ResponseWriter, r *http.Request) {
-	gallery, err := g.galleryByID(w, r)
+	gallery, err := g.galleryByID(w, r, userMustOwnGallery)
 	if err != nil {
-		return
-	}
-
-	user := appcontext.User(r.Context())
-	if gallery.UserID != user.ID {
-		http.Error(w, "You are not authorized to edit this gallery", http.StatusForbidden)
 		return
 	}
 
