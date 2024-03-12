@@ -101,6 +101,10 @@ func main() {
 
 	emailService := models.NewEmailService(cfg.SMTP)
 
+	gallaryService := &models.GalleryService{
+		DB: db,
+	}
+
 	// Middlewares
 	userMiddleware := controllers.UserMiddleware{
 		SessionService: sessionService,
@@ -108,7 +112,8 @@ func main() {
 
 	csrfMiddleware := csrf.Protect(
 		[]byte(cfg.CSRF.Key),
-		csrf.Secure(cfg.CSRF.Secure), // TODO: update this before deploying
+		csrf.Secure(cfg.CSRF.Secure),
+		csrf.Path("/"),
 	)
 
 	// User controller
@@ -117,6 +122,11 @@ func main() {
 		EmailService:         emailService,
 		SessionService:       sessionService,
 		PasswordResetService: passwordResetService,
+	}
+
+	// Gallery Controller
+	galleryController := controllers.Galleries{
+		GalleryService: gallaryService,
 	}
 
 	usersController.Templates.New = views.Must(
@@ -137,6 +147,10 @@ func main() {
 
 	usersController.Templates.ResetPassword = views.Must(
 		views.ParseFS(templates.FS, "reset-pw.gohtml", "tailwind.gohtml"),
+	)
+
+	galleryController.Templates.New = views.Must(
+		views.ParseFS(templates.FS, "galleries/new.gohtml", "tailwind.gohtml"),
 	)
 
 	// Router and Routes
@@ -176,6 +190,13 @@ func main() {
 	r.Post("/forgot-pw", usersController.ProcessForgotPassword)
 	r.Get("/reset-pw", usersController.ResetPassword)
 	r.Post("/reset-pw", usersController.ProcessResetPassword)
+
+	r.Route("/galleries", func(r chi.Router) {
+		r.Group(func(r chi.Router) {
+			r.Use(userMiddleware.RequireUser)
+			r.Get("/new", galleryController.New)
+		})
+	})
 
 	r.NotFound(notFoundHandler)
 

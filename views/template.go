@@ -11,6 +11,7 @@ import (
 	"io/fs"
 	"log"
 	"net/http"
+	"path/filepath"
 
 	"github.com/gorilla/csrf"
 )
@@ -31,7 +32,8 @@ func Must(t Template, err error) Template {
 }
 
 func ParseFS(fs fs.FS, patterns ...string) (Template, error) {
-	tpl := template.New(patterns[0])
+	// tpl := template.New(patterns[0])
+	tpl := template.New(filepath.Base(patterns[0]))
 
 	tpl = tpl.Funcs(
 		template.FuncMap{
