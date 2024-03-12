@@ -1,0 +1,53 @@
+{{template "header" .}}
+<div class="p-8 w-full">
+	<h1 class="pt-4 pb-8 text-3xl font-bold text-gray-800">Edit your Gallery</h1>
+
+	<form action="/galleries/{{.ID}}" method="post">
+		<div class="hidden">
+			{{ csrfField }}
+		</div>
+		<div class="py-2">
+			<label for="title" class="text-sm font-semibold text-gray-800">
+				Title
+			</label>
+			<input
+				name="title"
+				id="title"
+				type="text"
+				placeholder="Gallery Title"
+				required
+				class="w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-800 rounded"
+				value="{{.Title}}"
+				autofocus
+			/>
+		</div>
+		<div class="py-4">
+			<button
+				type="submit"
+				class="py-2 px-8 bg-indigo-600 hover:bg-indigo-700 text-white rounded font-bold text-lg"
+			>
+				Update
+			</button>
+		</div>
+	</form>
+
+	<div class="py-4">
+		<h2>Dangerous actions</h2>
+		<form
+			action="/galleries/{{.ID}}/delete"
+			method="post"
+			onsubmit="return confirm('Do you really want to delete this gallery?');"
+		>
+			<div class="hidden">
+				{{ csrfField }}
+			</div>
+			<button
+				type="submit"
+				class="py-2 px-8 bg-red-600 hover:bg-red-700 text-white rounded font-bold text-lg"
+			>
+				Delete
+			</button>
+		</form>
+	</div>
+</div>
+{{template "footer" .}}

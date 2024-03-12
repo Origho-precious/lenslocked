@@ -18,7 +18,7 @@ const (
 
 type PasswordReset struct {
 	ID        int
-	UserId    int
+	UserID    int
 	Token     string
 	TokenHash string
 	ExpiresAt time.Time
@@ -49,11 +49,11 @@ func (service *PasswordResetService) Create(email string) (
 	// Verify we have a valid email address for a user
 	email = strings.ToLower(email)
 
-	var userId int
+	var userID int
 
 	row := service.DB.QueryRow(`
 		SELECT id FROM users WHERE email = $1;`, email)
-	err := row.Scan(&userId)
+	err := row.Scan(&userID)
 	if err != nil {
 		// TODO: Consider returning a specific error when the user does not exist.
 		return nil, fmt.Errorf("create: %w", err)
@@ -76,7 +76,7 @@ func (service *PasswordResetService) Create(email string) (
 	}
 
 	pwReset := PasswordReset{
-		UserId:    userId,
+		UserID:    userID,
 		Token:     token,
 		TokenHash: service.hash(token),
 		ExpiresAt: time.Now().Add(duration),
@@ -88,7 +88,7 @@ func (service *PasswordResetService) Create(email string) (
     VALUES ($1, $2, $3) ON CONFLICT (user_id) DO
     UPDATE
     SET token_hash = $2, expires_at = $3
-    RETURNING id;`, pwReset.UserId, pwReset.TokenHash, pwReset.ExpiresAt,
+    RETURNING id;`, pwReset.UserID, pwReset.TokenHash, pwReset.ExpiresAt,
 	)
 
 	err = row.Scan(&pwReset.ID)
@@ -118,7 +118,7 @@ func (service *PasswordResetService) Consume(token string) (*User, error) {
 
 	err := row.Scan(
 		&pwReset.ID, &pwReset.ExpiresAt,
-		&user.Id, &user.Email, &user.PasswordHash)
+		&user.ID, &user.Email, &user.PasswordHash)
 	if err != nil {
 		return nil, fmt.Errorf("consume: %w", err)
 	}

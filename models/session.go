@@ -14,8 +14,8 @@ const (
 )
 
 type Session struct {
-	Id     int
-	UserId int
+	ID     int
+	UserID int
 	// Token is only set when creating a new session. When looking up a session
 	// this will be left empty, as we only store the hash of a session token
 	// in our database and we cannot reverse it into a raw token.
@@ -32,7 +32,7 @@ type SessionService struct {
 	BytesPerToken int
 }
 
-func (ss SessionService) Create(userId int) (*Session, error) {
+func (ss SessionService) Create(userID int) (*Session, error) {
 	bytesPerToken := ss.BytesPerToken
 
 	if bytesPerToken < MinBytesPerToken {
@@ -45,7 +45,7 @@ func (ss SessionService) Create(userId int) (*Session, error) {
 	}
 
 	session := Session{
-		UserId:    userId,
+		UserID:    userID,
 		Token:     token,
 		TokenHash: ss.hash(token),
 	}
@@ -55,11 +55,11 @@ func (ss SessionService) Create(userId int) (*Session, error) {
 		VALUES ($1, $2) ON CONFLICT (user_id) DO
 		UPDATE
 		SET token_hash = $2
-    RETURNING id;`, session.UserId, session.TokenHash,
+    RETURNING id;`, session.UserID, session.TokenHash,
 	)
 
-	err = row.Scan(&session.Id)
-	
+	err = row.Scan(&session.ID)
+
 	if err != nil {
 		return nil, fmt.Errorf("create: %w", err)
 	}
@@ -79,7 +79,7 @@ func (ss *SessionService) User(token string) (*User, error) {
 		WHERE sessions.token_hash = $1;`, tokenHash,
 	)
 
-	err := row.Scan(&user.Id, &user.Email, &user.PasswordHash)
+	err := row.Scan(&user.ID, &user.Email, &user.PasswordHash)
 
 	if err != nil {
 		return nil, fmt.Errorf("user: %w", err)

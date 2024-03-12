@@ -57,7 +57,7 @@ func (u Users) Create(w http.ResponseWriter, r *http.Request) {
 		u.Templates.New.Execute(w, r, data, err)
 	}
 
-	session, err := u.SessionService.Create(int(user.Id))
+	session, err := u.SessionService.Create(int(user.ID))
 
 	if err != nil {
 		fmt.Println(err)
@@ -91,7 +91,7 @@ func (u Users) ProcessSignin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	session, err := u.SessionService.Create(int(user.Id))
+	session, err := u.SessionService.Create(int(user.ID))
 
 	if err != nil {
 		fmt.Println(err)
@@ -244,7 +244,7 @@ func (u Users) ProcessResetPassword(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Update the password
-	err = u.UserService.UpdatePassword(int(user.Id), data.Password)
+	err = u.UserService.UpdatePassword(int(user.ID), data.Password)
 	if err != nil {
 		fmt.Println(err)
 		http.Error(w, "Something went wrong.", http.StatusInternalServerError)
@@ -252,7 +252,7 @@ func (u Users) ProcessResetPassword(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Signin the User
-	session, err := u.SessionService.Create(int(user.Id))
+	session, err := u.SessionService.Create(int(user.ID))
 	if err != nil {
 		fmt.Println(err)
 		http.Redirect(w, r, "/signin", http.StatusFound)

@@ -8,7 +8,7 @@ import (
 
 type Gallery struct {
 	ID     int
-	UserId int
+	UserID int
 	Title  string
 }
 
@@ -17,17 +17,17 @@ type GalleryService struct {
 }
 
 func (service *GalleryService) Create(
-	title string, userId int,
+	title string, userID int,
 ) (*Gallery, error) {
 	gallery := Gallery{
 		Title:  title,
-		UserId: userId,
+		UserID: userID,
 	}
 
 	row := service.DB.QueryRow(`
 		INSERT INTO galleries (title, user_id)
 		VALUES ($1, $2) RETURNING id;`,
-		gallery.Title, gallery.UserId,
+		gallery.Title, gallery.UserID,
 	)
 
 	err := row.Scan(&gallery.ID)
@@ -47,7 +47,7 @@ func (service *GalleryService) ByID(id int) (*Gallery, error) {
 		WHERE id = $1;`, gallery.ID,
 	)
 
-	err := row.Scan(&gallery.Title, &gallery.UserId)
+	err := row.Scan(&gallery.Title, &gallery.UserID)
 
 	if err != nil {
 		if apperrors.Is(err, sql.ErrNoRows) {
@@ -59,11 +59,11 @@ func (service *GalleryService) ByID(id int) (*Gallery, error) {
 	return &gallery, nil
 }
 
-func (service *GalleryService) ByUserID(userId int) ([]Gallery, error) {
+func (service *GalleryService) ByUserID(userID int) ([]Gallery, error) {
 	rows, err := service.DB.Query(`
 		SELECT id, title
 		FROM galleries
-		WHERE user_id = $1;`, userId,
+		WHERE user_id = $1;`, userID,
 	)
 
 	if err != nil {
@@ -73,7 +73,7 @@ func (service *GalleryService) ByUserID(userId int) ([]Gallery, error) {
 	var galleries []Gallery
 
 	for rows.Next() {
-		gallery := Gallery{UserId: userId}
+		gallery := Gallery{UserID: userID}
 
 		err := rows.Scan(&gallery.ID, &gallery.Title)
 		if err != nil {

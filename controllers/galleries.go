@@ -32,14 +32,14 @@ func (g Galleries) New(w http.ResponseWriter, r *http.Request) {
 
 func (g Galleries) Create(w http.ResponseWriter, r *http.Request) {
 	var data struct {
-		UserId int
+		UserID int
 		Title  string
 	}
 
-	data.UserId = appcontext.User(r.Context()).Id
+	data.UserID = appcontext.User(r.Context()).ID
 	data.Title = r.FormValue("title")
 
-	gallery, err := g.GalleryService.Create(data.Title, data.UserId)
+	gallery, err := g.GalleryService.Create(data.Title, data.UserID)
 
 	if err != nil {
 		g.Templates.New.Execute(w, r, data, err)
@@ -69,17 +69,17 @@ func (g Galleries) Edit(w http.ResponseWriter, r *http.Request) {
 	}
 
 	user := appcontext.User(r.Context())
-	if gallery.UserId != user.Id {
+	if gallery.UserID != user.ID {
 		http.Error(w, "You are not authorized to edit this gallery", http.StatusForbidden)
 		return
 	}
 
 	var data struct {
-		Id    int
+		ID    int
 		Title string
 	}
 
-	data.Id = gallery.ID
+	data.ID = gallery.ID
 	data.Title = gallery.Title
 
 	g.Templates.Edit.Execute(w, r, data)

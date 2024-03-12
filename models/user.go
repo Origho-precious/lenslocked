@@ -12,7 +12,7 @@ import (
 )
 
 type User struct {
-	Id           int
+	ID           int
 	Email        string
 	PasswordHash string
 }
@@ -45,7 +45,7 @@ func (us *UserService) Create(email, password string) (*User, error) {
 		PasswordHash: passwordHash,
 	}
 
-	err = row.Scan(&newUser.Id)
+	err = row.Scan(&newUser.ID)
 
 	if err != nil {
 		// See if we can use this error as a PgError
@@ -77,7 +77,7 @@ func (us UserService) Authenticate(email, password string) (*User, error) {
 		Email: email,
 	}
 
-	err := row.Scan(&user.Id, &user.PasswordHash)
+	err := row.Scan(&user.ID, &user.PasswordHash)
 
 	if err != nil {
 		return nil, fmt.Errorf("authenticating user: %w", err)
