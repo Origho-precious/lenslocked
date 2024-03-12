@@ -25,29 +25,6 @@ type Galleries struct {
 
 type galleryOpt func(http.ResponseWriter, *http.Request, *models.Gallery) error
 
-var dogImages = []string{
-	"https://images.unsplash.com/photo-1591160690555-5debfba289f0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxNDA1Mzh8MHwxfHJhbmRvbXx8fHx8fHx8fDE3MTAyNTMyMjB8&ixlib=rb-4.0.3&q=80&w=1080",
-	"https://images.unsplash.com/photo-1589941013453-ec89f33b5e95?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxNDA1Mzh8MHwxfHJhbmRvbXx8fHx8fHx8fDE3MTAyNTMyMjB8&ixlib=rb-4.0.3&q=80&w=1080",
-	"https://images.unsplash.com/photo-1585908286456-991b5d0e53f4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxNDA1Mzh8MHwxfHJhbmRvbXx8fHx8fHx8fDE3MTAyNTMyMjB8&ixlib=rb-4.0.3&q=80&w=1080",
-	"https://images.unsplash.com/photo-1618173745201-8e3bf8978acc?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxNDA1Mzh8MHwxfHJhbmRvbXx8fHx8fHx8fDE3MTAyNTMyMjB8&ixlib=rb-4.0.3&q=80&w=1080",
-	"https://images.unsplash.com/photo-1633722715463-d30f4f325e24?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxNDA1Mzh8MHwxfHJhbmRvbXx8fHx8fHx8fDE3MTAyNTMyMjB8&ixlib=rb-4.0.3&q=80&w=1080",
-	"https://images.unsplash.com/photo-1568640347023-a616a30bc3bd?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxNDA1Mzh8MHwxfHJhbmRvbXx8fHx8fHx8fDE3MTAyNTMyMjB8&ixlib=rb-4.0.3&q=80&w=1080",
-	"https://images.unsplash.com/photo-1534551767192-78b8dd45b51b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxNDA1Mzh8MHwxfHJhbmRvbXx8fHx8fHx8fDE3MTAyNTMyMjB8&ixlib=rb-4.0.3&q=80&w=1080",
-	"https://images.unsplash.com/photo-1540411003967-af56b79be677?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxNDA1Mzh8MHwxfHJhbmRvbXx8fHx8fHx8fDE3MTAyNTMyMjB8&ixlib=rb-4.0.3&q=80&w=1080",
-	"https://images.unsplash.com/photo-1612940960267-4549a58fb257?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxNDA1Mzh8MHwxfHJhbmRvbXx8fHx8fHx8fDE3MTAyNTMyMjB8&ixlib=rb-4.0.3&q=80&w=1080",
-	"https://images.unsplash.com/photo-1600077029182-92ac8906f9a3?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxNDA1Mzh8MHwxfHJhbmRvbXx8fHx8fHx8fDE3MTAyNTMyMjB8&ixlib=rb-4.0.3&q=80&w=1080",
-	"https://images.unsplash.com/flagged/photo-1550973078-10a2d124c99c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxNDA1Mzh8MHwxfHJhbmRvbXx8fHx8fHx8fDE3MTAyNTMyMjB8&ixlib=rb-4.0.3&q=80&w=1080",
-	"https://images.unsplash.com/photo-1574760112346-8443c3773437?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxNDA1Mzh8MHwxfHJhbmRvbXx8fHx8fHx8fDE3MTAyNTMyMjB8&ixlib=rb-4.0.3&q=80&w=1080",
-	"https://images.unsplash.com/photo-1598875184988-5e67b1a874b8?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxNDA1Mzh8MHwxfHJhbmRvbXx8fHx8fHx8fDE3MTAyNTMyMjB8&ixlib=rb-4.0.3&q=80&w=1080",
-	"https://images.unsplash.com/photo-1553776590-89774e24b34a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxNDA1Mzh8MHwxfHJhbmRvbXx8fHx8fHx8fDE3MTAyNTMyMjB8&ixlib=rb-4.0.3&q=80&w=1080",
-	"https://images.unsplash.com/photo-1557495235-340eb888a9fb?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxNDA1Mzh8MHwxfHJhbmRvbXx8fHx8fHx8fDE3MTAyNTMyMjB8&ixlib=rb-4.0.3&q=80&w=1080",
-	"https://images.unsplash.com/photo-1591946614720-90a587da4a36?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxNDA1Mzh8MHwxfHJhbmRvbXx8fHx8fHx8fDE3MTAyNTMyMjB8&ixlib=rb-4.0.3&q=80&w=1080",
-	"https://images.unsplash.com/photo-1600077106724-946750eeaf3c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxNDA1Mzh8MHwxfHJhbmRvbXx8fHx8fHx8fDE3MTAyNTMyMjB8&ixlib=rb-4.0.3&q=80&w=1080",
-	"https://images.unsplash.com/photo-1520580413066-ac45756bdc71?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxNDA1Mzh8MHwxfHJhbmRvbXx8fHx8fHx8fDE3MTAyNTMyMjB8&ixlib=rb-4.0.3&q=80&w=1080",
-	"https://images.unsplash.com/photo-1502673530728-f79b4cab31b1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxNDA1Mzh8MHwxfHJhbmRvbXx8fHx8fHx8fDE3MTAyNTMyMjB8&ixlib=rb-4.0.3&q=80&w=1080",
-	"https://images.unsplash.com/photo-1514984879728-be0aff75a6e8?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxNDA1Mzh8MHwxfHJhbmRvbXx8fHx8fHx8fDE3MTAyNTMyMjB8&ixlib=rb-4.0.3&q=80&w=1080",
-}
-
 func userMustOwnGallery(
 	w http.ResponseWriter, r *http.Request, gallery *models.Gallery,
 ) error {
@@ -189,16 +166,33 @@ func (g Galleries) Show(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	type Image struct {
+		GalleryID int
+		Filename  string
+	}
+
 	var data struct {
 		ID     int
 		Title  string
-		Images []string
+		Images []Image
 	}
 
 	data.ID = gallery.ID
 	data.Title = gallery.Title
 
-	data.Images = append(data.Images, dogImages...)
+	images, err := g.GalleryService.Images(gallery.ID)
+	if err != nil {
+		fmt.Println(err)
+		http.Error(w, "Something went wrong", http.StatusInternalServerError)
+		return
+	}
+
+	for _, image := range images {
+		data.Images = append(data.Images, Image{
+			GalleryID: image.GalleryID,
+			Filename:  image.Filename,
+		})
+	}
 
 	g.Templates.Show.Execute(w, r, data)
 }
