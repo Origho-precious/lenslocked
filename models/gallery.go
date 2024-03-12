@@ -2,8 +2,11 @@ package models
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	apperrors "github/Origho-precious/lenslocked/errors"
+	"io/fs"
+	"os"
 	"path/filepath"
 	"strings"
 )
@@ -166,4 +169,40 @@ func (service *GalleryService) Images(galleryID int) ([]Image, error) {
 		}
 	}
 	return images, nil
+}
+
+func (service *GalleryService) Image(
+	galleryID int, filename string,
+) (Image, error) {
+	imagePath := filepath.Join(service.galleryDir(galleryID), filename)
+
+	_, err := os.Stat(imagePath)
+	if err != nil {
+		if errors.Is(err, fs.ErrNotExist) {
+			return Image{}, ErrNotFound
+		}
+		return Image{}, fmt.Errorf("querying for image: %w", err)
+	}
+
+	image := Image{
+		Filename:  filename,
+		GalleryID: galleryID,
+		Path:      imagePath,
+	}
+
+	return image, nil
+}
+
+func (service *GalleryService) DeleteImage(
+	galleryID int, filename string,
+) error {
+	image, err := service.Image(galleryID, filename)
+	if err != nil {
+		return fmt.Errorf("deleting image: %w", err)
+	}
+	err = os.Remove(image.Path)
+	if err != nil {
+		return fmt.Errorf("deleting image: %w", err)
+	}
+	return nil
 }
