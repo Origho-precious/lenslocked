@@ -1,0 +1,16 @@
+{{template "header" .}}
+<div class="px-8 py-12 w-full">
+	<h1 class="pt-4 pb-8 text-3xl font-bold text-gray-900">
+		{{.Title}}
+	</h1>
+	<div class="columns-4 gap-4 space-y-4">
+		{{ range.Images }}
+		<div class="h-min w-full">
+			<a href="{{.}}">
+				<img class="w-full" src="{{.}}" />
+			</a>
+		</div>
+		{{ end }}
+	</div>
+</div>
+{{template "footer" .}}

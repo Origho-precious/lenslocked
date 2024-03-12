@@ -161,6 +161,10 @@ func main() {
 		views.ParseFS(templates.FS, "galleries/index.gohtml", "tailwind.gohtml"),
 	)
 
+	galleryController.Templates.Show = views.Must(
+		views.ParseFS(templates.FS, "galleries/show.gohtml", "tailwind.gohtml"),
+	)
+
 	// Router and Routes
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
@@ -200,6 +204,7 @@ func main() {
 	r.Post("/reset-pw", usersController.ProcessResetPassword)
 
 	r.Route("/galleries", func(r chi.Router) {
+		r.Get("/{id}", galleryController.Show)
 		r.Group(func(r chi.Router) {
 			r.Use(userMiddleware.RequireUser)
 			r.Get("/", galleryController.Index)
