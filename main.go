@@ -124,11 +124,6 @@ func main() {
 		PasswordResetService: passwordResetService,
 	}
 
-	// Gallery Controller
-	galleryController := controllers.Galleries{
-		GalleryService: gallaryService,
-	}
-
 	usersController.Templates.New = views.Must(
 		views.ParseFS(templates.FS, "signup.gohtml", "tailwind.gohtml"),
 	)
@@ -149,8 +144,17 @@ func main() {
 		views.ParseFS(templates.FS, "reset-pw.gohtml", "tailwind.gohtml"),
 	)
 
+	// Gallery Controller
+	galleryController := controllers.Galleries{
+		GalleryService: gallaryService,
+	}
+
 	galleryController.Templates.New = views.Must(
 		views.ParseFS(templates.FS, "galleries/new.gohtml", "tailwind.gohtml"),
+	)
+
+	galleryController.Templates.Edit = views.Must(
+		views.ParseFS(templates.FS, "galleries/edit.gohtml", "tailwind.gohtml"),
 	)
 
 	// Router and Routes
@@ -196,6 +200,8 @@ func main() {
 			r.Use(userMiddleware.RequireUser)
 			r.Get("/new", galleryController.New)
 			r.Post("/", galleryController.Create)
+			r.Get("/{id}/edit", galleryController.Edit)
+			r.Post("/{id}", galleryController.Update)
 		})
 	})
 
