@@ -212,6 +212,7 @@ func main() {
 			r.Post("/", galleryController.Create)
 			r.Post("/{id}", galleryController.Update)
 			r.Get("/{id}/edit", galleryController.Edit)
+			r.Post("/{id}/delete", galleryController.Delete)
 		})
 	})
 
