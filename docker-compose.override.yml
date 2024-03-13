@@ -1,0 +1,18 @@
+# override defines changes to services and new services that we want to use in development.
+version: "3.9"
+
+services:
+  # All settings from the base docker-compose.yml will be used and we can change or add new ones here.
+  db:
+    ports:
+      # We expose the DB ports so that apps not running via docker-compose can  connect to the DB.
+      - 5432:5432
+
+  # Adminer provides a nice little web UI to connect to databases
+  adminer:
+    image: adminer
+    restart: always
+    environment:
+      ADMINER_DESIGN: dracula
+    ports:
+      - 3333:8080
