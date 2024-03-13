@@ -5,7 +5,6 @@ import (
 	"fmt"
 	appcontext "github/Origho-precious/lenslocked/context"
 	"github/Origho-precious/lenslocked/models"
-	"io"
 	"net/http"
 	"net/url"
 	"path/filepath"
@@ -298,6 +297,7 @@ func (g Galleries) UploadImage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	fileHeaders := r.MultipartForm.File["images"]
+
 	for _, fileHeader := range fileHeaders {
 		file, err := fileHeader.Open()
 		if err != nil {
@@ -307,11 +307,21 @@ func (g Galleries) UploadImage(w http.ResponseWriter, r *http.Request) {
 
 		defer file.Close()
 
-		fmt.Printf(
-			"Attempting to upload %v for gallery %d.\n",
-			fileHeader.Filename, gallery.ID,
-		)
+		err = g.GalleryService.CreateImage(gallery.ID, fileHeader.Filename, file)
+		if err != nil {
+			var fileErr models.FileError
 
-		io.Copy(w, file)
+			if errors.As(err, &fileErr) {
+				msg := fmt.Sprintf("%v has an invalid content type or extension. Only png, gif, and jpg files can be uploaded.", fileHeader.Filename)
+				http.Error(w, msg, http.StatusBadRequest)
+				return
+			}
+
+			http.Error(w, "Something went wrong", http.StatusInternalServerError)
+			return
+		}
 	}
+
+	editPath := fmt.Sprintf("/galleries/%d/edit", gallery.ID)
+	http.Redirect(w, r, editPath, http.StatusFound)
 }
