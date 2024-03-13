@@ -31,13 +31,21 @@ type config struct {
 
 func loadEnvConfig() (config, error) {
 	var cfg config
-
 	err := godotenv.Load()
 	if err != nil {
 		return cfg, err
 	}
-
-	cfg.PSQL = models.DefaultPostgresConfig()
+	cfg.PSQL = models.PostgresConfig{
+		Host:     os.Getenv("PSQL_HOST"),
+		Port:     os.Getenv("PSQL_PORT"),
+		User:     os.Getenv("PSQL_USER"),
+		SSLMode:  os.Getenv("PSQL_SSLMODE"),
+		Password: os.Getenv("PSQL_PASSWORD"),
+		DbName:   os.Getenv("PSQL_DATABASE"),
+	}
+	if cfg.PSQL.Host == "" && cfg.PSQL.Port == "" {
+		return cfg, fmt.Errorf("no PSQL Config provided")
+	}
 
 	cfg.SMTP.Host = os.Getenv("SMTP_HOST")
 	portStr := os.Getenv("SMTP_PORT")
@@ -49,10 +57,11 @@ func loadEnvConfig() (config, error) {
 	cfg.SMTP.Username = os.Getenv("SMTP_USERNAME")
 	cfg.SMTP.Password = os.Getenv("SMTP_PASSWORD")
 
-	cfg.CSRF.Key = "gFvi45R4fy5xNBlnEeZtQbfAVCYEIAUX"
-	cfg.CSRF.Secure = false
+	cfg.CSRF.Key = os.Getenv("CSRF_KEY")
+	cfg.CSRF.Secure = os.Getenv("CSRF_SECURE") == "true"
 
-	cfg.Server.Address = ":5500"
+	cfg.Server.Address = os.Getenv("SERVER_ADDRESS")
+
 	return cfg, nil
 }
 
